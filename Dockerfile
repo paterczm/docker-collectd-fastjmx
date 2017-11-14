@@ -4,7 +4,7 @@ MAINTAINER Marek Paterczyk <paterczm@users.noreply.github.com>
 USER root
 
 # TODO: wildfly-core + deps have 100 MB, but I need only a couple of jars... optimize
-RUN yum install -y java-1.8.0-openjdk-devel collectd collectd-java wildfly-core jboss-remoting-jmx staxmapper jboss-dmr procps-ng gettext && yum clean all
+RUN yum update -y && yum install -y java-1.8.0-openjdk-devel collectd collectd-java wildfly-core jboss-remoting-jmx staxmapper jboss-dmr procps-ng gettext && yum clean all
 
 # https://community.rsa.com/docs/DOC-45221
 RUN ln -svf /usr/lib/jvm/jre/lib/amd64/server/libjvm.so /usr/lib64/libjvm.so

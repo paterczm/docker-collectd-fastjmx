@@ -1,0 +1,27 @@
+jboss:
+  build: jboss-admin
+  ports:
+   - "8080:8080"
+   - "9990:9990"
+  tty: true
+collectd:
+  build: .
+  links:
+   - jboss
+   - graphite
+  tty: true
+  environment:
+   - CARBON_HOST=graphite
+   - CARBON_PREFIX=test_
+   - FASTJMX_URL=service:jmx:remote+http://jboss:9990
+   - FASTJMX_USER=user
+   - FASTJMX_PASSWORD=redhat
+   - FASTJMX_LOGLEVEL=FINE
+graphite:
+  image: hopsoft/graphite-statsd
+  ports:
+   - "80:80"
+   - "2003-2004:2003-2004"
+   - "2023-2024:2023-2024"
+   - "8125:8125/udp"
+   - "8126:8126"

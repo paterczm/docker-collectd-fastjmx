@@ -1,0 +1,82 @@
+# We are limited to a single Java plugin per collectd daemon, so unfortunately any jmx metrics need to be defined in a single conf file
+<Plugin "java">
+    JVMARG "-Djava.class.path=/usr/share/collectd/java/collectd-api.jar:/usr/lib/jvm/java/lib/jconsole.jar:/usr/lib/jvm/java/lib/tools.jar:/etc/collectd.d/collectd-fast-jmx.jar:/usr/share/java/jboss-remoting-jmx/remoting-jmx.jar:/usr/share/java/jboss-remoting/jboss-remoting.jar:/usr/share/java/jboss-logging/jboss-logging.jar:/usr/share/java/xnio/xnio-nio.jar:/usr/share/java/xnio/xnio-api.jar:/usr/share/java/jboss-sasl/jboss-sasl.jar:/usr/share/java/jboss-marshalling/jboss-marshalling-river.jar:/usr/share/java/jboss-marshalling/jboss-marshalling.jar:/usr/share/java/staxmapper/staxmapper.jar:/usr/share/java/jboss-dmr/jboss-dmr.jar:/usr/share/java/wildfly-core/wildfly-cli.jar:/usr/share/java/wildfly-core/wildfly-protocol.jar:/usr/share/java/wildfly-core/wildfly-controller-client.jar"
+    LoadPlugin "com.e_gineering.collectd.FastJMX"
+
+    <Plugin "FastJMX">
+
+        LogLevel "$FASTJMX_LOGLEVEL"
+        ForceLoggingTo "$FASTJMX_FORCELOGLEVELTO"
+
+        # Garbage collector information
+        <MBean "garbage_collector">
+            ObjectName "java.lang:type=GarbageCollector,*"
+            InstancePrefix "gc-" # InstancePrefix basically builds the collectd data path, kind of painful to work with
+            InstanceFrom "name"  # Think of InstanceFrom as making a for each block. There is a set of GarbageCollector objects, I want to split them up by name and for each of these objects gather the values below.
+
+            <Value>
+                Type "invocations"
+                Table false
+                Attribute "CollectionCount"
+            </Value>
+
+            <Value>
+                Type "total_time_in_ms"
+                InstancePrefix "collection_time"
+                Table false
+                Attribute "CollectionTime"
+            </Value>
+        </MBean>
+
+        # Generic heap/nonheap memory usage.
+        <MBean "memory">
+            ObjectName "java.lang:type=Memory"
+            #InstanceFrom ""
+            InstancePrefix "memory"
+
+            # Creates four values: committed, init, max, used
+            <Value>
+                Type "memory"
+                Table true
+                Attribute "HeapMemoryUsage"
+                InstancePrefix "heap-"
+            </Value>
+
+            # Creates four values: committed, init, max, used
+            <Value>
+                Type "memory"
+                Table true
+                Attribute "NonHeapMemoryUsage"
+                InstancePrefix "nonheap-"
+            </Value>
+        </MBean>
+
+        # Memory usage by memory pool.
+        # We might need to remember to adjust the graphs in managed envs as the names will be different
+        <MBean "memory_pool">
+            ObjectName "java.lang:type=MemoryPool,*"
+            InstancePrefix "memory_pool-"
+            InstanceFrom "name"
+
+            <Value>
+                Type "memory"
+                Table true
+                Attribute "Usage"
+            </Value>
+        </MBean>
+
+        <Connection>
+            ServiceURL "$FASTJMX_URL"
+            Host "$HOSTNAME"
+            Username "$FASTJMX_USER"
+            Password "$FASTJMX_PASSWORD"
+            # When remoting-jmx is found in the service url, jboss is assumed ad synchronous wrapper is enabled
+            # Wildfly10/EAP7 use a different protocol, so we have to enable synchronous explicitly.
+            synchronous true
+            TTL $FASTJMX_TTL
+            Collect "garbage_collector"
+            Collect "memory"
+            Collect "memory_pool"
+        </Connection>
+    </Plugin>
+</Plugin>

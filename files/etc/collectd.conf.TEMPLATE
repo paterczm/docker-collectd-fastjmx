@@ -1,0 +1,14 @@
+Hostname "$HOSTNAME"
+FQDNLookup false
+
+#BaseDir "/var/lib/collectd"
+#PluginDir "/usr/lib/collectd"
+TypesDB "/usr/share/collectd/types.db"
+
+AutoLoadPlugin true
+
+Interval $COLLECTD_INTERVAL
+Timeout $COLLECTD_TIMEOUT
+ReadThreads $COLLECTD_READ_THREADS
+Include "/etc/collectd.d/*.conf"
+

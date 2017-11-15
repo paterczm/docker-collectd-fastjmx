@@ -10,7 +10,7 @@ export CARBON_PREFIX=${CARBON_PREFIX?"You need to provide CARBON_PREFIX"}
 
 export FASTJMX_LOGLEVEL=${FASTJMX_LOGLEVEL:-INFO}
 export FASTJMX_FORCELOGLEVELTO=${FASTJMX_FORCELOGLEVELTO:-WARNING}
-export FASTJMX_URL=${FASTJMX_URL?"You need to provide FASTJMX_URL, e.g. service:jmx:remote+http://jboss:9990"}
+export FASTJMX_URL=${FASTJMX_URL:-service:jmx:remote+http://$HOSTNAME:9990}
 export FASTJMX_USER=${FASTJMX_USER?"You need to provide jboss management FASTJMX_USER"}
 export FASTJMX_PASSWORD=${FASTJMX_PASSWORD?"You need to provide jboss management FASTJMX_PASSWORD"}
 export FASTJMX_TTL=${FASTJMX_TTL:-30}

@@ -24,7 +24,7 @@ ADD files/setup-and-start.sh /setup-and-start.sh
 RUN useradd --system --user-group collectd
 RUN chown -R collectd:collectd /etc/collectd.d /etc/collectd.conf
 
-USER collectd
+USER 997
 
 CMD [ "/setup-and-start.sh" ]
 
